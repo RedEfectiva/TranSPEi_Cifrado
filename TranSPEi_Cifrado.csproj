@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<Version>1.0.0</Version>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
+		<PackageReference Include="MySql.Data" Version="8.4.0" />
+		<PackageReference Include="MySql.EntityFrameworkCore" Version="8.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Infrastructure\Persistence\" />
+	</ItemGroup>
+	
+</Project>
