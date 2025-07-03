@@ -2,21 +2,21 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using TranSPEi_Cifrado.Domain.Interfaces.External;
+using TranSPEi_ApiModGes_DbContext.Domain.Attributes;
 using TranSPEi_Cifrado.Domain.Interfaces.Repositories;
-using TranSPEi_Cifrado.Domain.Attributes;
+using Microsoft.Extensions.Logging;
+
 
 namespace TranSPEi_Cifrado.Application.Common.Services
 {
     public class StoreEntityUseCase : IStoreEntityUseCase
     {
+        private readonly ILogger<StoreEntityUseCase> _loggerService;
         private readonly IGenericRepository _repository;
-        private readonly ILoggerService _loggerService;
 
         public StoreEntityUseCase(
             IGenericRepository repository,
-            ILoggerService loggerService)
+            ILogger<StoreEntityUseCase> loggerService)
         {
             _repository = repository;
             _loggerService = loggerService;
@@ -30,7 +30,7 @@ namespace TranSPEi_Cifrado.Application.Common.Services
                 var savedEntity = await _repository.StoreAsync(entity);
                 if (savedEntity == null)
                 {
-                    _loggerService.Warn($"No se pudo guardar la entidad {typeof(T).Name}.");
+                    _loggerService.LogWarning($"No se pudo guardar la entidad {typeof(T).Name}.");
                     return null;
                 }
 
@@ -41,7 +41,7 @@ namespace TranSPEi_Cifrado.Application.Common.Services
             }
             catch (Exception ex)
             {
-                _loggerService.Error($"Error al ejecutar StoreEntityUseCase para {typeof(T).Name}.", ex);
+                _loggerService.LogError($"Error al ejecutar StoreEntityUseCase para {typeof(T).Name}.", ex);
                 return null;
             }
         }
@@ -50,12 +50,12 @@ namespace TranSPEi_Cifrado.Application.Common.Services
         {
             if (entity == null)
             {
-                _loggerService.Warn("Entidad nula en DecryptSensitiveProperties.");
+                _loggerService.LogWarning("Entidad nula en DecryptSensitiveProperties.");
                 return;
             }
 
             var entityType = typeof(T);
-            _loggerService.Debug($"Iniciando descifrado de propiedades sensibles para entidad {entityType.Name}");
+            _loggerService.LogDebug($"Iniciando descifrado de propiedades sensibles para entidad {entityType.Name}");
 
             foreach (var property in entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
@@ -67,26 +67,26 @@ namespace TranSPEi_Cifrado.Application.Common.Services
                         // Verificar si el valor está en formato Base64
                         if (!value.StartsWith("ENC:"))
                         {
-                            _loggerService.Warn($"El valor de la propiedad {property.Name} en entidad {entityType.Name} no está en formato Base64: {value}");
+                            _loggerService.LogWarning($"El valor de la propiedad {property.Name} en entidad {entityType.Name} no está en formato Base64: {value}");
                             continue;
                         }
 
                         try
                         {
-                            _loggerService.Debug($"Desencriptando propiedad {property.Name} de entidad {entityType.Name} con valor {value}");
+                            _loggerService.LogDebug($"Desencriptando propiedad {property.Name} de entidad {entityType.Name} con valor {value}");
                             var decryptedValue = EncryptionService.Instance.Decrypt(value);
                             property.SetValue(entity, decryptedValue);
-                            _loggerService.Debug($"Propiedad {property.Name} desencriptada. Valor: {decryptedValue}");
+                            _loggerService.LogDebug($"Propiedad {property.Name} desencriptada. Valor: {decryptedValue}");
                         }
                         catch (Exception ex)
                         {
-                            _loggerService.Error($"Error al desencriptar propiedad {property.Name} de entidad {entityType.Name}. Valor: {value}", ex);
+                            _loggerService.LogError($"Error al desencriptar propiedad {property.Name} de entidad {entityType.Name}. Valor: {value}", ex);
                             throw;
                         }
                     }
                     else
                     {
-                        _loggerService.Debug($"Propiedad {property.Name} de entidad {entityType.Name} está vacía o nula, no se desencripta.");
+                        _loggerService.LogDebug($"Propiedad {property.Name} de entidad {entityType.Name} está vacía o nula, no se desencripta.");
                     }
                 }
             }

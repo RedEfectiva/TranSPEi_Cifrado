@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<Version>1.0.0</Version>
+	<Version>1.0.5</Version>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -17,6 +17,7 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
 		<PackageReference Include="MySql.Data" Version="8.4.0" />
 		<PackageReference Include="MySql.EntityFrameworkCore" Version="8.0.2" />
+		<PackageReference Include="TranSPEi_ApiModGes_DbContext" Version="1.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
