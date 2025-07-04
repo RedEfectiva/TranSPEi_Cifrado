@@ -16,9 +16,7 @@ namespace TranSPEi_Cifrado.Infrastructure.DbContext
         public SensitiveDataInterceptor(ILogger<SensitiveDataInterceptor> loggerService, IConfiguration configuration)
         {
             _loggerService = loggerService;
-            // Leer el valor de IsEncryptionEnabled desde appsettings.json, con valor por defecto true si no está configurado
-            //_configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            IsEncryptionEnabled = bool.Parse(configuration["Encryption:Enabled"] ?? "true");
+            IsEncryptionEnabled = bool.Parse(configuration["Encryption:Enabled"] ?? "false");
 
 
             _loggerService.LogDebug($"SensitiveDataInterceptor inicializado. Cifrado habilitado: {IsEncryptionEnabled}");
