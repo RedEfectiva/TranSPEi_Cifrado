@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-namespace TranSPEi_Cifrado.Domain.Interfaces.Repositories
+﻿namespace TranSPEi_Cifrado.Domain.Interfaces.Repositories
 {
     public interface IStoreEntityUseCase
     {

@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Reflection;
-//using TranSPEi_Cifrado.Application.Common.Interfaces;
-using TranSPEi_Cifrado.Application.Common.Services;
-using TranSPEi_ApiModGes_DbContext.Domain.Attributes;
+using TranSPEi_Cifrado.Domain.Attributes;
 using Microsoft.Extensions.Logging;
+using TranSPEi_Cifrado.Application.Common.Services;
 namespace TranSPEi_Cifrado.Infrastructure.DbContext
 {
     public class SensitiveDataInterceptor : SaveChangesInterceptor, IMaterializationInterceptor
@@ -137,7 +136,7 @@ namespace TranSPEi_Cifrado.Infrastructure.DbContext
                             property.SetValue(instance, decryptedValue);
                             
                             
-                            _loggerService.LogDebug($"Propiedad {property.Name} desencriptada para entidad {entityType.Name}. Valor desencriptado: {decryptedValue}");
+                           _loggerService.LogDebug($"Propiedad {property.Name} desencriptada para entidad {entityType.Name}. Valor desencriptado: {decryptedValue}");
                         }
                         catch (InvalidOperationException ex)
                         {
