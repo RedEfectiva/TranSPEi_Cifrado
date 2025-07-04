@@ -4,15 +4,24 @@ using System.Reflection;
 using TranSPEi_Cifrado.Domain.Attributes;
 using Microsoft.Extensions.Logging;
 using TranSPEi_Cifrado.Application.Common.Services;
+using Microsoft.Extensions.Configuration;
+using System.Configuration;
 namespace TranSPEi_Cifrado.Infrastructure.DbContext
 {
     public class SensitiveDataInterceptor : SaveChangesInterceptor, IMaterializationInterceptor
     {
         private readonly ILogger<SensitiveDataInterceptor> _loggerService;
-        public SensitiveDataInterceptor(ILogger<SensitiveDataInterceptor> loggerService)
+        private readonly IConfiguration _configuration;
+        public bool IsEncryptionEnabled;
+        public SensitiveDataInterceptor(ILogger<SensitiveDataInterceptor> loggerService, IConfiguration configuration)
         {
             _loggerService = loggerService;
-            _loggerService.LogDebug("SensitiveDataInterceptor inicializado.");
+            // Leer el valor de IsEncryptionEnabled desde appsettings.json, con valor por defecto true si no está configurado
+            //_configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            IsEncryptionEnabled = bool.Parse(configuration["Encryption:Enabled"] ?? "true");
+
+
+            _loggerService.LogDebug($"SensitiveDataInterceptor inicializado. Cifrado habilitado: {IsEncryptionEnabled}");
         }
 
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
@@ -80,11 +89,18 @@ namespace TranSPEi_Cifrado.Infrastructure.DbContext
                                     _loggerService.LogDebug($"Encriptando propiedad {property.Name} de entidad {entry.Entity.GetType().Name} con valor {value}");
                                     var encryptedValue = EncryptionService.Instance.Encrypt(value);
                                     //Se omite la persistencia para no afectar flujos
-                                    property.SetValue(entry.Entity, encryptedValue);
-                                    //property.SetValue(entry.Entity, value);
-                                    //_loggerService.Debug($"Propiedad ENCRIPTADA : {property.Name} | Valor: {encryptedValue} | Longitud: {encryptedValue.Length}");
-                                    //var decryptedValue = EncryptionService.Instance.Decrypt(encryptedValue);
-                                    //_loggerService.Debug($"Propiedad DESENCRIPTADA : {property.Name} | Valor: {decryptedValue} | Longitud: {decryptedValue.Length}");
+                                    if (IsEncryptionEnabled)
+                                    {
+                                        property.SetValue(entry.Entity, encryptedValue);
+                                    }
+                                    else
+                                    {
+                                        property.SetValue(entry.Entity, value);
+                                    }
+                                        
+                                    _loggerService.LogDebug($"Propiedad ENCRIPTADA : {property.Name} | Valor: {encryptedValue} | Longitud: {encryptedValue.Length}");
+                                    var decryptedValue = EncryptionService.Instance.Decrypt(encryptedValue);
+                                    _loggerService.LogDebug($"Propiedad DESENCRIPTADA : {property.Name} | Valor: {decryptedValue} | Longitud: {decryptedValue.Length}");
 
                                 }
                                 catch (Exception ex)
